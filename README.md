@@ -1,10 +1,12 @@
-**EzStorm**
+**Thrist & Hunger**
+Mad Max (2015) Mod that actually have the features:
+- Progresively decay Max health. Force you to look up for food and water more often
+- Future projects
+- TODO: Stamina bar in order to force the player to be more strategic when facing fights
+- TODO: Madness management. Introduces a new gameplay mechanic that tracks Max's mental state as he survives in the wasteland. The harsher the environment and the more violent his actions, the more his sanity deteriorates 
+   — Unlocking hallucinations, erratic behavior, and visual/auditory effects. 
+   - Regaining sanity requires rest, drive, calm exploration, completing missions.
 ---
-`EzStorm` is a set of cheat menu functionality for the Mad Max game.
-- support for Steam and GOG versions
-- `AirBrake` - static flight of the player (also works if you are sitting in the car). It turns on and off on `RSHIFT`. The flight speed is controlled by the mouse wheel.
-- It is planned to expand the functionality. XD. I wrote this plugin in 4.5 hours.
-
 *Installation*:
 - You need to install the `Ultimate ASI Loader`
-- put `mm_ezstorm.asi` in the `scripts` folder
+- put `mm_thristh.asi` in the `scripts` folder
