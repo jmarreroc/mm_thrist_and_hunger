@@ -20,8 +20,8 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 
 DEFHOOK(void, Thirst__Hunger, (void* thiz, float dt)) {
-    DecayManager::Update(dt);
-    StaminaManager::Update(dt);
+    DecayManager::Instance().Update(dt);
+    StaminaManager::Instance().Update(dt);
     return Thirst__Hunger_orig(thiz, dt);
 }
 

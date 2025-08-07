@@ -3,9 +3,12 @@
 #include <mm/game/charactermanager.h>
 #include <cstdio>
 
-void DecayManager::Update(float dt) {
+DecayManager& DecayManager::Instance() {
+    static DecayManager instance;
+    return instance;
+}
 
-    static float timer = 0.0f;
+void DecayManager::Update(float dt) {
     timer += dt;
 
     if (timer >= 5.0f) {
