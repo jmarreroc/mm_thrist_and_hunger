@@ -1,14 +1,14 @@
 ﻿#include "plugin.h"
-#include <mm/game/go/character.h>
 #include "mm/core/input.h"
-#include <mm/game/charactermanager.h>
+#include "th/decay/DecayManager.h"
+#include "th/stamina/StaminaManager.h"
 
 DLLATTATCH;
 
 void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
-    //AllocConsole();
-    //freopen("CONOUT$", "w", stdout);
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
     
     // Ejecutar PluginHooks en un hilo aparte con un delay
     std::thread([]() {
@@ -19,28 +19,13 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 }
 
-DEFHOOK(void, CPlayer__Decay, (void* thiz, float dt)) {
-    static float timer = 0.0f;
-    timer += dt;
-
-    if (timer >= 5.0f) {
-        timer = 0.0f;
-
-        CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
-        if (player) {
-            float health = player->GetHealth();
-            printf("[Thrist&Hunger] currentHealth (0x180): %.2f\n", health);
-
-            if (health > 1.0f) {
-                player->SetHealth(health - 1.0f);
-            }
-        }
-    }
-    return CPlayer__Decay_orig(thiz, dt);
+DEFHOOK(void, Thirst__Hunger, (void* thiz, float dt)) {
+    DecayManager::Update(dt);
+    StaminaManager::Update(dt);
+    return Thirst__Hunger_orig(thiz, dt);
 }
 
 
-
 void PluginHooks() {
-    HookMgr::Install(ADDRESS(0x1404C6670, 0x1420DEAC0), CPlayer__Decay_hook, CPlayer__Decay_orig);
+    HookMgr::Install(ADDRESS(0x1404C6670, 0x1420DEAC0), Thirst__Hunger_hook, Thirst__Hunger_orig);
 }

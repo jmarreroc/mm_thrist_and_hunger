@@ -33,6 +33,8 @@
     <ClCompile Include="mm\imgui\imgui\imgui_tables.cpp" />
     <ClCompile Include="mm\imgui\imgui\imgui_widgets.cpp" />
     <ClCompile Include="mm\imgui\imgui_renderer.cpp" />
+	<ClCompile Include="th\decay\DecayManager.cpp" />
+	<ClCompile Include="th\stamina\StaminaManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mm\core.h" />
