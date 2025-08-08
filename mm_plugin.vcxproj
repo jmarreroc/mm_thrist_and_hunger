@@ -34,7 +34,11 @@
     <ClCompile Include="mm\imgui\imgui\imgui_widgets.cpp" />
     <ClCompile Include="mm\imgui\imgui_renderer.cpp" />
 	<ClCompile Include="th\decay\DecayManager.cpp" />
+	<ClCompile Include="th\vehicle\VehicleDamageProxy.cpp" />
 	<ClCompile Include="th\stamina\StaminaManager.cpp" />
+	<ClCompile Include="th\tools\KeyMapManager.cpp" />
+	<ClCompile Include="th\tools\InputInterceptor.cpp" />
+	<ClCompile Include="th\tools\Scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mm\core.h" />

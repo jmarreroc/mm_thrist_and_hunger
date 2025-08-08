@@ -2,6 +2,7 @@
 #include "mm/core/input.h"
 #include "th/decay/DecayManager.h"
 #include "th/stamina/StaminaManager.h"
+#include "th/vehicle/VehicleDamageProxy.h"
 
 DLLATTATCH;
 
@@ -19,9 +20,11 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 }
 
+
 DEFHOOK(void, Thirst__Hunger, (void* thiz, float dt)) {
     DecayManager::Instance().Update(dt);
-    StaminaManager::Instance().Update(dt);
+    VehicleDamageProxy::Instance().Update(dt);
+    //StaminaManager::Instance().Update(dt); pure sh*t....
     return Thirst__Hunger_orig(thiz, dt);
 }
 

@@ -9,19 +9,30 @@ DecayManager& DecayManager::Instance() {
 }
 
 void DecayManager::Update(float dt) {
+    CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
+    if (!player) return;
+
+    float health = player->GetHealth();
+    float healthPercent = health / 2000.0f;
+
+    // Intervalo dinámico
+    float baseInterval = 30.0f;
+    float minInterval = 10.0f;
+    float interval = baseInterval - (baseInterval - minInterval) * healthPercent;
+
+    float maxDamage = 10.0f;
+    float minDamage = 1.0f;
+    float damage = minDamage + (maxDamage - minDamage) * healthPercent;
+
     timer += dt;
 
-    if (timer >= 5.0f) {
+    if (timer >= interval) {
         timer = 0.0f;
+        printf("[DecayManager] currentHealth: %.2f (interval: %.2f, damage: %.2f)\n",
+            health, interval, damage);
 
-        CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
-        if (player) {
-            float health = player->GetHealth();
-            printf("[DecayManager] currentHealth: %.2f\n", health);
-
-            if (health > 1.0f) {
-                player->SetHealth(health - 1.0f);
-            }
+        if (health > 1.0f) {
+            player->SetHealth(health - damage);
         }
     }
 }

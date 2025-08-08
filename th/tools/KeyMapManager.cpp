@@ -1,7 +1,21 @@
-// KeyMapManager.cpp
 #include "KeyMapManager.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
+
+KeyMapManager& KeyMapManager::Get() {
+    static KeyMapManager instance;
+    return instance;
+}
+
+KeyMapManager::KeyMapManager() {
+    if (!LoadFromFile("settings.ini")) {
+        std::cerr << "[KeyMapManager] Failed to load settings.ini\n";
+    }
+    else {
+        std::cout << "[KeyMapManager] settings.ini loaded\n";
+    }
+}
 
 bool KeyMapManager::LoadFromFile(const std::string& path) {
     std::ifstream file(path);
@@ -11,7 +25,7 @@ bool KeyMapManager::LoadFromFile(const std::string& path) {
     bool insideKeyMapping = false;
 
     while (std::getline(file, line)) {
-        if (line.empty() || line[0] == ';') continue; // Skip comments
+        if (line.empty() || line[0] == ';') continue;
 
         if (line == "[KeyMapping]") {
             insideKeyMapping = true;
@@ -19,7 +33,7 @@ bool KeyMapManager::LoadFromFile(const std::string& path) {
         }
 
         if (insideKeyMapping) {
-            if (line[0] == '[') break; // Finished reading keymapping section
+            if (line[0] == '[') break;
 
             auto pos = line.find('=');
             if (pos == std::string::npos) continue;
