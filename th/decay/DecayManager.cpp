@@ -25,12 +25,8 @@ void DecayManager::Update(float dt) {
     float damage = minDamage + (maxDamage - minDamage) * healthPercent;
 
     timer += dt;
-
     if (timer >= interval) {
         timer = 0.0f;
-        printf("[DecayManager] currentHealth: %.2f (interval: %.2f, damage: %.2f)\n",
-            health, interval, damage);
-
         if (health > 1.0f) {
             player->SetHealth(health - damage);
         }

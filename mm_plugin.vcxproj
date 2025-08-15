@@ -36,6 +36,8 @@
 	<ClCompile Include="th\decay\DecayManager.cpp" />
 	<ClCompile Include="th\vehicle\VehicleDamageProxy.cpp" />
 	<ClCompile Include="th\stamina\StaminaManager.cpp" />
+	<ClCompile Include="th\scrap\ScrapInlineHook.cpp" />  
+	<ClCompile Include="th\roguelite\ScrapLossManager.cpp" />
 	<ClCompile Include="th\tools\KeyMapManager.cpp" />
 	<ClCompile Include="th\tools\InputInterceptor.cpp" />
 	<ClCompile Include="th\tools\Scanner.cpp" />

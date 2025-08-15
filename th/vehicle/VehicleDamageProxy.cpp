@@ -9,6 +9,8 @@ VehicleDamageProxy& VehicleDamageProxy::Instance() {
     return instance;
 }
 
+float timer = 0.0f;
+
 void VehicleDamageProxy::Update(float dt) {
     CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
     CVehicle* vehicle = player->GetVehiclePtr();
@@ -33,24 +35,19 @@ void VehicleDamageProxy::Update(float dt) {
     float baseMultiplier = 0.0f;
 
     if (damage <= 10.0f) {
-        printf("[VehicleDamageProxy] Small hit: %.2f (no damage to player)\n", damage);
         lastVehicleHealth = currentVehicleHealth;
         return; // No player damage for small hits
     }
     else if (damage <= 25.0f) {
-        printf("[VehicleDamageProxy] Moderate hit: %.2f\n", damage);
-        baseMultiplier = 3.0f; // Softer multiplier
+        baseMultiplier = 6.0f; // Softer multiplier
     }
     else if (damage <= 50.0f) {
-        printf("[VehicleDamageProxy] Strong hit: %.2f\n", damage);
-        baseMultiplier = 6.0f;
+        baseMultiplier = 8.0f;
     }
     else if (damage <= 100.0f) {
-        printf("[VehicleDamageProxy] Very strong hit: %.2f\n", damage);
         baseMultiplier = 10.0f;
     }
     else {
-        printf("[VehicleDamageProxy] Brutal hit: %.2f\n", damage);
         baseMultiplier = 12.0f;
     }
 
@@ -61,9 +58,6 @@ void VehicleDamageProxy::Update(float dt) {
     // Final damage calculation
     float playerDamage = damage * baseMultiplier * healthFactor;
     player->SetHealth(playerHealth - playerDamage);
-
-    printf("[VehicleDamageProxy] Player damage applied: %.2f (remaining health: %.2f)\n",
-        playerDamage, player->GetHealth());
 
     // Store the new vehicle health for next frame comparison
     lastVehicleHealth = currentVehicleHealth;

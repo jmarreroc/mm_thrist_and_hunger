@@ -8,8 +8,6 @@ public:
 
 private:
     DecayManager() = default;
-
-    // Opcional: evita copia y asignación
     DecayManager(const DecayManager&) = delete;
     DecayManager& operator=(const DecayManager&) = delete;
 

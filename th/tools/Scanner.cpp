@@ -20,7 +20,7 @@ void ScanCharacterFields(CCharacter* player, size_t maxOffset) {
 
         if (!std::isfinite(val)) continue;
 
-        if (val >= 0.0f && val <= 10000.0f) {
+        if (val >= 0.0f) {
             float prev = prevCharacterValues[offset];
             if (std::abs(prev - val) > 0.01f) {
                 printf("Offset 0x%03X = %.4f (prev: %.4f)\n", offset, val, prev);
@@ -92,8 +92,7 @@ void ScanVehicleFields(CVehicle* vehicle, size_t maxOffset) {
 
         if (!std::isfinite(val)) continue;
 
-        // Filtrar solo floats entre 50 y 100
-        if (val >= 50.0f && val <= 100.0f) {
+        if (val > 0.0f) {
             float prev = prevVehicleValues[offset];
             if (std::abs(prev - val) > 0.01f) {
                 printf("Offset 0x%03X = %.4f (prev: %.4f)\n", offset, val, prev);
