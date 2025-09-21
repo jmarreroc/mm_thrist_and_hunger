@@ -9,7 +9,6 @@ VehicleDamageProxy& VehicleDamageProxy::Instance() {
     return instance;
 }
 
-float timer = 0.0f;
 
 void VehicleDamageProxy::Update(float dt) {
     CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
@@ -18,7 +17,6 @@ void VehicleDamageProxy::Update(float dt) {
     if (!player || !vehicle) return;
 
     float currentVehicleHealth = vehicle->GetHealth();
-
     // First frame, just initialize lastVehicleHealth
     if (lastVehicleHealth < 0.0f) {
         lastVehicleHealth = currentVehicleHealth;

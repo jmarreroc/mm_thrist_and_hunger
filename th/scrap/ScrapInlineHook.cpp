@@ -71,7 +71,7 @@ bool WriteMem(void* dst, const void* src, size_t sz) {
 
 bool InstallScrapMidHook() {
     HMODULE hMod = GetModuleHandleW(L"MadMax.exe");
-    if (!hMod) { std::printf("[ScrapHook] MadMax.exe not loaded yet\n"); return false; }
+    if (!hMod) { return false; }
 
     uint8_t* dos = reinterpret_cast<uint8_t*>(hMod);
     auto nt = reinterpret_cast<IMAGE_NT_HEADERS*>(dos + reinterpret_cast<IMAGE_DOS_HEADER*>(dos)->e_lfanew);
@@ -81,12 +81,12 @@ bool InstallScrapMidHook() {
     const char pat[] = "\xC8\x0F\xB6\x44\xC8\x08\x48\x8D\x14";
     const char mask[] = "xxxxxxxxx";
     uint8_t* hit = FindPattern(codeBase, codeSize, pat, mask);
-    if (!hit) { std::printf("[ScrapHook] Pattern not found\n"); return false; }
+    if (!hit) { return false; }
 
     uint8_t* inj = hit + 1;
     uint8_t* ret = inj + 5;
     uint8_t* cave = reinterpret_cast<uint8_t*>(AllocNear(inj, 0x200));
-    if (!cave) { std::printf("[ScrapHook] Couldn´t reserve code cave\n"); return false; }
+    if (!cave) { return false; }
 
     std::vector<uint8_t> stub;
     size_t je1_pos, jne2_pos, jmp_end_pos, store_scraps_pos, endstore_pos, jmp_back_pos;
@@ -147,7 +147,6 @@ bool InstallScrapMidHook() {
     }
 
     if (!WriteMem(cave, stub.data(), stub.size())) {
-        std::printf("[ScrapHook] Didn´t write in the stub\n");
         return false;
     }
 
@@ -161,28 +160,11 @@ bool InstallScrapMidHook() {
     }
 
     if (!WriteMem(inj, jmp5, sizeof(jmp5))) {
-        std::printf("[ScrapHook] Couldn´t write JMP to original place\n");
         return false;
     }
 
     FlushInstructionCache(GetCurrentProcess(), inj, sizeof(jmp5));
     return true;
-}
-
-void ScanScrapCandidatesFloat(float expected_val) {
-    void* p = g_var_canteen.load(std::memory_order_acquire);
-    if (!p) return;
-    
-
-    uint8_t* base = reinterpret_cast<uint8_t*>(p);
-    printf("Looking value %.3f in block %p\n", expected_val, p);
-
-    for (int offset = 0; offset <= 0x400 - sizeof(float); ++offset) {
-        float val = *reinterpret_cast<float*>(base + offset);
-        if (fabs(val - expected_val) < 0.0001f) {
-            printf("¡Match float found in offset +0x%02X! (%.3f)\n", offset, val);
-        }
-    }
 }
 
 float GetScraps() {

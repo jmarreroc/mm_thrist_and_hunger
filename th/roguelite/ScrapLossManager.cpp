@@ -1,9 +1,7 @@
 #include "ScrapLossManager.h"
 #include <mm/game/go/character.h>
 #include <mm/game/charactermanager.h>
-#include <th/tools/Scanner.h>
 #include <th/scrap/ScrapInlineHook.h>
-#include <cstdio>
 #include <mm/game/game.h>
 
 ScrapLossManager& ScrapLossManager::Instance() {

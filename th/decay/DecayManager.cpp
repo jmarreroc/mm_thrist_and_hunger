@@ -11,11 +11,10 @@ DecayManager& DecayManager::Instance() {
 void DecayManager::Update(float dt) {
     CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
     if (!player) return;
-
     float health = player->GetHealth();
     float healthPercent = health / 2000.0f;
 
-    // Intervalo dinámico
+    // Dynamic interval
     float baseInterval = 30.0f;
     float minInterval = 10.0f;
     float interval = baseInterval - (baseInterval - minInterval) * healthPercent;

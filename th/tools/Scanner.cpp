@@ -1,4 +1,4 @@
-#include "Scanner.h"
+﻿#include "Scanner.h"
 #include <cstdio>
 #include <cmath>
 #include <unordered_map>
@@ -102,4 +102,102 @@ void ScanVehicleFields(CVehicle* vehicle, size_t maxOffset) {
     }
 
     printf("==== [End ScanVehicleFields] ====\n");
+}
+
+
+struct FuelCandidate {
+    int offset;
+    float lastValue;
+    int stabilityScore = 0;
+};
+
+std::vector<FuelCandidate> fuelCandidates;
+int confirmedFuelOffset = -1;
+
+
+void ScanVehicleForFuel(CCharacter* vehicle) {
+    if (!vehicle) return;
+
+    uint8_t* base = reinterpret_cast<uint8_t*>(vehicle);
+    static int scanStep = 0;
+    const int stepSize = 0x1200;
+
+    int startOffset = scanStep * stepSize;
+    int endOffset = startOffset + stepSize;
+    scanStep++;
+
+    if (startOffset > 0x2400) scanStep = 0;
+
+    printf("[Scanner] Explorando offsets %X - %X\n", startOffset, endOffset);
+
+    // Explorar nuevos candidatos
+    for (int offset = startOffset; offset < endOffset; offset += 4) {
+        float val = *(float*)(base + offset);
+        if (val >= 40.0f && val <= 50.0f) {
+            bool exists = false;
+            for (auto& c : fuelCandidates) {
+                if (c.offset == offset) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                fuelCandidates.push_back({ offset, val, 1 });
+                printf("  → Nuevo candidato +0x%X = %.2f\n", offset, val);
+            }
+        }
+    }
+
+    // Reevaluar todos los candidatos
+    for (auto& candidate : fuelCandidates) {
+        float val = *(float*)(base + candidate.offset);
+        if (val >= 0.0f && val <= 100.0f) {
+            if (fabs(val - candidate.lastValue) > 0.01f) {
+                candidate.stabilityScore++;
+                candidate.lastValue = val;
+                printf("  → Candidato +0x%X cambió a %.2f (score: %d)\n", candidate.offset, val, candidate.stabilityScore);
+            }
+        }
+    }
+
+    // Confirmar el mejor candidato (con mayor score)
+    int bestScore = 0;
+    int bestOffset = -1;
+    for (auto& candidate : fuelCandidates) {
+        if (candidate.stabilityScore > bestScore) {
+            bestScore = candidate.stabilityScore;
+            bestOffset = candidate.offset;
+        }
+    }
+
+    if (bestScore >= 3) {
+        confirmedFuelOffset = bestOffset;
+        printf("[✔] Offset confirmado: +0x%X\n", confirmedFuelOffset);
+    }
+
+    // Mostrar valor actual si ya hay offset confirmado
+    if (confirmedFuelOffset >= 0) {
+        float fuel = *(float*)(base + confirmedFuelOffset);
+        printf("[Fuel] Confirmed offset +0x%X → %.2f\n", confirmedFuelOffset, fuel);
+    }
+}
+
+
+
+void ScanVehicleForFuel2(CVehicle* vehicle) {
+    if (!vehicle) {
+        return;
+    }
+
+    uint8_t* base = reinterpret_cast<uint8_t*>(vehicle);
+    printf("Escaneando vehículo en %p buscando valores tipo gasolina (0.0 - 50.0)\n", vehicle);
+
+    for (int offset = 0; offset <= 0x2400; offset += 4) {
+        float val = *reinterpret_cast<float*>(base + offset);
+
+        // Filtrar valores dentro del rango esperado
+        if (val >= 40.0f && val <= 50.0f) {
+            printf("Posible gasolina en offset +0x%X -> %.2f\n", offset, val);
+        }
+    }
 }
