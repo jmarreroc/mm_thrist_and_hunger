@@ -1,6 +1,9 @@
 #include "DecayManager.h"
 #include <mm/game/go/character.h>
 #include <mm/game/charactermanager.h>
+#include "mm/game/game.h"
+#include "th/scrap/ScrapInlineHook.h"
+#include "th/fuel/FuelInlineHook.h"
 #include <cstdio>
 
 DecayManager& DecayManager::Instance() {
@@ -9,8 +12,14 @@ DecayManager& DecayManager::Instance() {
 }
 
 void DecayManager::Update(float dt) {
+    if (CGameState::m_InMainMenu || CGameState::m_State != CGameState::E_GAME_RUN) {
+        initialized = false;
+    }
+    
     CCharacter* player = CAvaSingle<CCharacterManager>::Instance->GetPlayerCharacter();
     if (!player) return;
+
+    
     float health = player->GetHealth();
     float healthPercent = health / 2000.0f;
 

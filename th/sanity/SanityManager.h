@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <th/tools/SDLPlayer.h>
+#include <th/tools/SDLPlayer2.h>
 
 class SanityManager {
 public:
@@ -13,6 +13,9 @@ public:
 
     // ==================== LOW ====================
     std::vector<std::string> low_sounds = {
+        "soundscape01.mp3",
+        "soundscape06.mp3",
+        "gutural-singing01.mp3",
         "low-man-whisper1.mp3",
         "low-man-whisper2.mp3",
         "low-man-whisper3.mp3",
@@ -30,23 +33,38 @@ public:
         "low-woman-whisper26.mp3",
         "low-woman-whisper3.mp3",
         "low-woman-whisper4.mp3",
-        "low-woman-cry1.mp3"
+        "low-woman-cry1.mp3",
+        "woman-beware01.mp3",
+        "woman-beware02.mp3",
+        "woman-can-you-help-me.mp3",
+        "woman-where-is-my-son.mp3",
+        "woman-run.mp3",
+        "woman-run-away.mp3",
+        "woman-im-dead.mp3",
+        "woman-there-was-blood.mp3"
     };
 
     // ==================== MID ====================
     std::vector<std::string> mid_sounds = {
+        "soundscape02.mp3",
+        "soundscape03.mp3",
+        "gutural-singing02.mp3",
         "mid-desert-horror1.mp3",
         "mid-desert-horror2.mp3",
         "mid-whispers1.mp3",
         "mid-whispers2.mp3",
         "mid-woman-whisper2.mp3",
         "mid-woman-whisper13.mp3",
-        "mid-woman-whisper3.mp3"
+        "mid-woman-whisper3.mp3",
+        "woman-ghost-singing.mp3"
 
     };
 
     // ==================== HIGH ====================
     std::vector<std::string> high_sounds = {
+        "soundscape05.mp3",
+        "soundscape07.mp3",
+        "gutural-singing03.mp3",
         "high-woman-whisper1.mp3",
         "high-desert-horror1.mp3",
         "high-whispers1.mp3",
@@ -55,10 +73,14 @@ public:
 
     // ==================== VERY HIGH ====================
     std::vector<std::string> veryhigh_sounds = {
+        "soundscape04.mp3",
+        "soundscape07.mp3",
+        "soundscape08.mp3",
         "veryhigh-whispers1.mp3",
         "veryhigh-whispers2.mp3",
         "veryhigh-whispers3.mp3",
-        "veryhigh-whispers4.mp3"
+        "veryhigh-whispers4.mp3",
+        "veryhigh-possessed-laugh.mp3"
     };
 
     // ==================== INSANITY ====================
@@ -78,9 +100,7 @@ public:
     std::vector<std::string> baby_cries_sounds = {
         "insanity_baby_cry1.ogg",
         "insanity_baby_cry2.ogg",
-        "insanity_baby_cry3.ogg",
-        "ghost-baby-crying01.mp3",
-        "ghost-baby-crying02.mp3"
+        "insanity_baby_cry3.ogg"
     };
 
 
@@ -156,46 +176,89 @@ public:
     };
 
 
-    std::vector<FlashbackEntry> flashes_mid = {
-        { "scripts/th/textures/mad/flashes/mid1.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/dragon-death.mp3"} },
-        { "scripts/th/textures/mad/flashes/mid2.png", { "flashes/flash_impact.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3" } },
-        { "scripts/th/textures/mad/flashes/mid3.png", { "flashes/flash_impact.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3"} },
-        { "scripts/th/textures/mad/flashes/mid4.png", { "flashes/flash_impact.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3"} },
-        { "scripts/th/textures/mad/flashes/mid5.png", { "flashes/flash_impact.mp3", "flashes/max-scream01.mp3" } },
-        { "scripts/th/textures/mad/flashes/mid6.png", { "flashes/flash_impact.mp3", "flashes/help01.mp3", "flashes/walking_cry_1.mp3", "flashes/walking_cry_2.mp3"} },
-        { "scripts/th/textures/mad/flashes/mid7.png", { "flashes/flash_impact.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
-        { "scripts/th/textures/mad/flashes/mid8.png", { "flashes/flash_impact.mp3", "flashes/laughter_grave1.mp3", "flashes/laughter_grave2.mp3", "flashes/laughter_grave3.mp3"} }
+    std::vector<FlashbackEntry> flashes_paced = {
+        { "scripts/th/textures/mad/flashes/mid2.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-voice-i-remember-it-all.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3"}},
+        { "scripts/th/textures/mad/flashes/mid3.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid4.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid6.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/help01.mp3", "flashes/walking_cry_1.mp3", "flashes/walking_cry_2.mp3"} },
+        { "scripts/th/textures/mad/flashes/high21.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-voice-i-remember-it-all.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high22.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-pain.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high3.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3" } },
+        { "scripts/th/textures/mad/flashes/high4.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3", "flashes/shout-hurt-scream.mp3" } },        
+        { "scripts/th/textures/mad/flashes/high6.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream01.mp3", "flashes/woman_scream_01.mp3", "flashes/woman_scream_02.mp3", "flashes/woman-scary-scream01.mp3"}},
+        { "scripts/th/textures/mad/flashes/veryhigh21.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/woman-ghost01.mp3" } },
+    };
 
+
+    std::vector<FlashbackEntry> flashes_mid = {
+        { "scripts/th/textures/mad/flashes/mid1.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/dragon-death.mp3", "flashes/pathetic-screaming.mp3"}},
+        { "scripts/th/textures/mad/flashes/mid2.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-voice-i-remember-it-all.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3"}},
+        { "scripts/th/textures/mad/flashes/mid3.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid4.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid5.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/max-scream01.mp3" } },
+        { "scripts/th/textures/mad/flashes/mid6.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/help01.mp3", "flashes/walking_cry_1.mp3", "flashes/walking_cry_2.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid7.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid8.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/laughter_grave1.mp3", "flashes/laughter_grave2.mp3", "flashes/laughter_grave3.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid9.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/join-me.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3", "flashes/monster-scream-low01.mp3"}},
+        { "scripts/th/textures/mad/flashes/mid10.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/monster-growl.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3", "flashes/monster-scream-low01.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid11.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/laughter_grave1.mp3", "flashes/laughter_grave2.mp3", "flashes/laughter_grave3.mp3", "flashes/demon-laugh01.mp3"}},
+        { "scripts/th/textures/mad/flashes/mid12.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/monster-laugh01.mp3", "flashes/monster-laugh02.mp3", "flashes/monster-laugh03.mp3", "flashes/monster-growl.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3", "flashes/monster-scream-low01.mp3"} },
+        { "scripts/th/textures/mad/flashes/mid13.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3"} }
     };
 
     std::vector<FlashbackEntry> flashes_high = {
-        { "scripts/th/textures/mad/flashes/high1.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/dragon-death.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3"}},
-        { "scripts/th/textures/mad/flashes/high2.png", { "flashes/flash_impact.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3"}},
-        { "scripts/th/textures/mad/flashes/high3.png", { "flashes/flash_impact.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3" } },
-        { "scripts/th/textures/mad/flashes/high4.png", { "flashes/flash_impact.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3", "flashes/shout-hurt-scream.mp3" } },
-        { "scripts/th/textures/mad/flashes/high5.png", { "flashes/flash_impact.mp3", "flashes/max-scream01.mp3" } },
-        { "scripts/th/textures/mad/flashes/high6.png", { "flashes/flash_impact.mp3", "flashes/girl-scream01.mp3", "flashes/woman_scream_01.mp3", "flashes/woman_scream_02.mp3"}},
-        { "scripts/th/textures/mad/flashes/high7.png", { "flashes/flash_impact.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3" } },
-        { "scripts/th/textures/mad/flashes/high8.png", { "flashes/flash_impact.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
-        { "scripts/th/textures/mad/flashes/high9.png", { "flashes/flash_impact.mp3", "flashes/laughter_grave1.mp3", "flashes/laughter_grave2.mp3", "flashes/laughter_grave3.mp3"} }
+        { "scripts/th/textures/mad/flashes/high1.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/dragon-death.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3", "flashes/pathetic-screaming.mp3"}},
+        { "scripts/th/textures/mad/flashes/high2.png", {  "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3"}},
+        { "scripts/th/textures/mad/flashes/high21.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-voice-i-remember-it-all.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high22.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/female-horror-pain.mp3", "flashes/woman-cry01.mp3", "flashes/woman-cry02.mp3", "flashes/woman-cry03.mp3", "flashes/woman-ghost01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high3.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/demonic-boy-scream01.mp3", "flashes/demonic-boy-scream02.mp3", "flashes/attackmix_01.mp3", "flashes/attackmix_02.mp3", "flashes/attackmix_03.mp3" } },
+        { "scripts/th/textures/mad/flashes/high4.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3", "flashes/shout-hurt-scream.mp3" } },
+        { "scripts/th/textures/mad/flashes/high5.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high51.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream01.mp3" } },
+        { "scripts/th/textures/mad/flashes/high6.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream01.mp3", "flashes/woman_scream_01.mp3", "flashes/woman_scream_02.mp3", "flashes/woman-scary-scream01.mp3"}},
+        { "scripts/th/textures/mad/flashes/high7.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3" } },
+        { "scripts/th/textures/mad/flashes/high8.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
+        { "scripts/th/textures/mad/flashes/high9.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/laughter_grave1.mp3", "flashes/laughter_grave2.mp3", "flashes/laughter_grave3.mp3"} },
+        { "scripts/th/textures/mad/flashes/high10.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3", "flashes/max-scream03.mp3"} },
+        { "scripts/th/textures/mad/flashes/high11.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/join-me.mp3", "flashes/inmortan-low01.mp3", "flashes/inmortan-low02.mp3", "flashes/undead-dragon-screech.mp3" } },
+        { "scripts/th/textures/mad/flashes/high12.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-laugh01.mp3", "flashes/monster-laugh02.mp3", "flashes/monster-laugh03.mp3", "flashes/monster-growl.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3" } },
+        { "scripts/th/textures/mad/flashes/high13.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream01.mp3", "flashes/dragon-roar01.mp3", "flashes/dragon-roar02.mp3", "flashes/dragon-roar03.mp3" } },
+        { "scripts/th/textures/mad/flashes/high14.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3"} }
+
+
     };
 
     std::vector<FlashbackEntry> flashes_veryhigh = {
-        { "scripts/th/textures/mad/flashes/veryhigh1.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/shout-hurt-scream.mp3", "flashes/dragon-death.mp3", "flashes/banshee-screaming.mp3"} },
-        { "scripts/th/textures/mad/flashes/veryhigh2.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3" } },
-        { "scripts/th/textures/mad/flashes/veryhigh3.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3"} },
-        { "scripts/th/textures/mad/flashes/veryhigh4.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3", "flashes/shout-hurt-scream.mp3" } },
-        { "scripts/th/textures/mad/flashes/veryhigh5.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream03.mp3" } },
-        { "scripts/th/textures/mad/flashes/veryhigh6.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/car-engine01.mp3", "flashes/car-engine02.mp3" } },
-        { "scripts/th/textures/mad/flashes/veryhigh7.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
-        { "scripts/th/textures/mad/flashes/veryhigh8.png", { "flashes/flash_impact.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/dragon-death.mp3", "flashes/banshee-screaming.mp3", "flashes/max-scream03.mp3"} }
+        { "scripts/th/textures/mad/flashes/veryhigh1.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/screech-01.mp3", "flashes/shout-hurt-scream.mp3", "flashes/dragon-death.mp3", "flashes/banshee-screaming.mp3", "flashes/pathetic-screaming.mp3"} },
+        { "scripts/th/textures/mad/flashes/veryhigh2.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh21.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/woman-ghost01.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh3.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3"} },
+        { "scripts/th/textures/mad/flashes/veryhigh4.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream02.mp3", "flashes/girl-scream03.mp3", "flashes/girl-scream04.mp3", "flashes/shout-hurt-scream.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh5.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream03.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh51.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/max-scream03.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh6.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/girl-scream01.mp3", "flashes/woman_scream_01.mp3", "flashes/woman_scream_02.mp3", "flashes/woman-scary-scream01.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh7.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/laughter1.mp3", "flashes/laughter2.mp3", "flashes/laughter3.mp3"} },
+        { "scripts/th/textures/mad/flashes/veryhigh8.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/dragon-death.mp3", "flashes/banshee-screaming.mp3", "flashes/max-scream03.mp3"} },
+        { "scripts/th/textures/mad/flashes/veryhigh9.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh10.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh11.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh12.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/spine-chilling-screeching.mp3","flashes/monster-laugh01.mp3", "flashes/monster-laugh02.mp3", "flashes/monster-laugh03.mp3", "flashes/monster-growl.mp3", "flashes/max-scream03.mp3", "flashes/inmortan-mid01.mp3", "flashes/inmortan-mid02.mp3", "flashes/echo-jumpscare.mp3" } },
+        { "scripts/th/textures/mad/flashes/veryhigh13.png", { "flashes/flash_impact.mp3", "flashes/flush.mp3", "flashes/boom.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/maniac-laugh.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3", "flashes/evil-laughter.mp3"} }
+
+
     };
 
 
     void playShuffle(const std::string& path, std::vector<std::string> files, int time);
     void playSanity(const std::string& path, float sanity);
     void triggerFlashback(float sanity);
-
+    void triggerPacedFlashback();
+    void PreloadFlashTextures(const std::vector<FlashbackEntry>& entries);
+    void PreloadAllFlashTextures() {
+        PreloadFlashTextures(flashes_paced);
+        PreloadFlashTextures(flashes_mid);
+        PreloadFlashTextures(flashes_high);
+    }
 private:
 
     SanityManager()
@@ -209,8 +272,15 @@ private:
     float director = 0.0f;
     float directorProbabilityBoost = 0.0f;
     float flashbackProbabilityBoost = 0.0f;
+    float lastFlashBack = 0.0f;
+
     bool diedRun = false;
     bool diedLoad = false;
+
+    bool flashesEnabled = false;
+    float flashesEnableTimerTriggered = false;
+    float flashesEnableTimer = 0.0f;
+
 
     float lastScrap = -1.0f;
 

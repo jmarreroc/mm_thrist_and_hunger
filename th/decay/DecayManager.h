@@ -12,4 +12,5 @@ private:
     DecayManager& operator=(const DecayManager&) = delete;
 
     float timer = 0.0f;
+    bool initialized = false;
 };

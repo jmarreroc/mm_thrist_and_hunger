@@ -6,40 +6,41 @@
 #include <string>
 #include <algorithm>
 #include <random>
+#include <unordered_map>
 
-class SDLPlayer {
+class SDLPlayer2 {
 public:
-    static SDLPlayer& Instance();
+    static SDLPlayer2& Instance();
 
     bool init();
     void shutdown();
 
-    // Reproducción de un solo MP3
+    void setGlobalVolume(int volume);
     bool playMP3Async(const std::string& file, int loops = 0);
     void stopMusic();
 
-    // Nueva función: shuffle playlist
     void playPlaylistShuffle(const std::vector<std::string>& files, bool loop, int maxDurationMs);
 
-    SDLPlayer(const SDLPlayer&) = delete;
-    SDLPlayer& operator=(const SDLPlayer&) = delete;
+    SDLPlayer2(const SDLPlayer2&) = delete;
+    SDLPlayer2& operator=(const SDLPlayer2&) = delete;
 
 private:
-    SDLPlayer() = default;
-    ~SDLPlayer() = default;
+    SDLPlayer2() = default;
+    ~SDLPlayer2() = default;
 
     bool initialized = false;
-    Mix_Music* currentMusic = nullptr;
 
-    // Para playlist shuffle
+    // Cache de efectos
+    std::unordered_map<std::string, Mix_Chunk*> soundCache;
+
+    // Playlist shuffle
     std::vector<std::string> playlist;
     bool loopPlaylist = false;
-
-    // En tu clase SDLPlayer (añade estos miembros privados)
     Uint32 startTime = 0;
-    int maxDurationMs = -1; // -1 = sin límite
+    int maxDurationMs = -1;
 
-
-    static void musicFinishedCallback();
+    static void channelFinishedCallback(int channel);
     void playNextInPlaylist();
+
+    Mix_Chunk* getOrLoadChunk(const std::string& file);
 };

@@ -189,10 +189,22 @@ void ScanVehicleForFuel2(CVehicle* vehicle) {
         return;
     }
 
+    // Guardamos el último log en una variable estática
+    static auto lastLog = std::chrono::steady_clock::now();
+
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastLog);
+
+    // Solo logueamos si ha pasado al menos 1 segundo
+    if (elapsed.count() < 1000) {
+        return;
+    }
+    lastLog = now;
+
     uint8_t* base = reinterpret_cast<uint8_t*>(vehicle);
     printf("Escaneando vehículo en %p buscando valores tipo gasolina (0.0 - 50.0)\n", vehicle);
 
-    for (int offset = 0; offset <= 0x2400; offset += 4) {
+    for (int offset = 0; offset <= 0x4800; offset += 4) {
         float val = *reinterpret_cast<float*>(base + offset);
 
         // Filtrar valores dentro del rango esperado

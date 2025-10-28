@@ -1,8 +1,12 @@
 ﻿#include "VehicleDamageProxy.h"
 #include <mm/game/go/character.h>
 #include <mm/game/go/vehicle.h>
+#include "mm/game/game.h"
 #include <mm/game/charactermanager.h>
-#include <cstdio>
+#include "th/fuel/FuelInlineHook.h"
+
+#include <windows.h>
+
 
 VehicleDamageProxy& VehicleDamageProxy::Instance() {
     static VehicleDamageProxy instance;

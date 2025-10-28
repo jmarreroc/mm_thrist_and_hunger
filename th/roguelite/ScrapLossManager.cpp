@@ -29,5 +29,4 @@ void ScrapLossManager::Update(float dt) {
         diedLoad = false;
         SetScraps(0.0);
     }
-
 }

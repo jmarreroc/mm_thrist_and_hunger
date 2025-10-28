@@ -9,3 +9,4 @@ void ScanVehicleFields(CVehicle* vehicle, size_t maxOffset = 0x400);
 void ScanCharacterFields(CCharacter* player, size_t maxOffset = 0x400);
 void ScanAll();
 void ScanVehicleForFuel(CCharacter* vehicle);
+void ScanVehicleForFuel2(CVehicle* vehicle);

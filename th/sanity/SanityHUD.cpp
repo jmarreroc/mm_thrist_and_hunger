@@ -20,6 +20,7 @@
 #include <mm/game/charactermanager.h>
 #include <mm/imgui/imgui/imgui_internal.h>
 #include <unordered_map>
+#include "th/Config.h"
 
 
 std::unordered_map<std::string, ImTextureID> g_TextureCache;
@@ -40,6 +41,7 @@ ImTextureID LoadTextureFromFileDX11(const char* filename, ID3D11Device* device, 
     desc.MipLevels = 1;
     desc.ArraySize = 1;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    //desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -73,8 +75,11 @@ ImTextureID LoadTextureFromFileDX11(const char* filename, ID3D11Device* device, 
 class SanityHUD : public ImGuiRenderer {
 public:
 
+    bool mod_title = false;
+    ImTextureID modBannerTexture = nullptr;
+
     float MAX_SANITY = 1000.0f;
-    float sanity = 1000.0;
+    float sanity = 800.0;
     ImTextureID calmTexture = nullptr;
     ImTextureID madTextures[5] = { nullptr };
     ImTextureID frameTextures[12] = { nullptr };    
@@ -104,14 +109,14 @@ public:
     }
 
     void Game() override {
-        /*
-        if (CGameState::m_InMainMenu || CGameState::m_State != CGameState::E_GAME_RUN || IsGuiOccludingMainDraw()) {
-            SendRenderEvent([this]() { force_hide = true; });
-            return;
-        }
-        
-        SendRenderEvent([this]() { force_hide = false; });
-        */
+        if (CGameState::m_InMainMenu) SendRenderEvent([this]() { 
+            modBannerTexture = LoadTexture("scripts/th/textures/banner.png");
+            mod_title = true; 
+        });        
+        else SendRenderEvent([this]() { 
+            mod_title = false;
+            modBannerTexture = nullptr;
+         });
     }
 
     void GameHandleEvent(Event const& _event) override {
@@ -122,8 +127,36 @@ public:
     }
 
     void Render() override {
+        const auto& cfg = Config::instance();
 
-        if (force_hide) return;
+        if (mod_title) {
+            if (!modBannerTexture) return;
+
+            ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+
+            ImVec2 screenMin = ImGui::GetMainViewport()->Pos;
+            ImVec2 screenSize = ImGui::GetMainViewport()->Size;
+
+            // Tamaño del banner (ajustable)
+            float bannerWidth = screenSize.x * 0.2f;
+            float bannerHeight = bannerWidth * (270.0f / 470.0f);
+
+            ImVec2 center = ImVec2(screenMin.x + screenSize.x * 0.5f, screenMin.y + screenSize.y * 0.15f);
+            ImVec2 topLeft = ImVec2(center.x - bannerWidth * 0.5f, center.y - bannerHeight * 0.5f);
+            ImVec2 bottomRight = ImVec2(center.x + bannerWidth * 0.5f, center.y + bannerHeight * 0.5f);
+
+            draw_list->AddImage(
+                modBannerTexture,
+                topLeft,
+                bottomRight,
+                ImVec2(0, 0), ImVec2(1, 1),
+                IM_COL32(255, 255, 255, 255)
+            );
+
+            return;
+        }
+
+        if (force_hide || !cfg.sanity().enabled) return;
 
         int currentFrame = ImGui::GetFrameCount();
         if (currentFrame > lastTouchedFrame + 1) { // allowing 1 frame lag
@@ -365,6 +398,35 @@ public:
         );
     }
 
+    ImTextureID LoadTexture(const std::string& filename) {
+        auto it = g_TextureCache.find(filename);
+        if (it != g_TextureCache.end()) {
+            return it->second;
+        }
+
+        void* backendUserData = ImGui::GetIO().BackendRendererUserData;
+        if (!backendUserData) return nullptr;
+
+        struct ImGui_ImplDX11_Data {
+            ID3D11Device* pd3dDevice;
+            ID3D11DeviceContext* pd3dDeviceContext;
+        };
+
+        ImGui_ImplDX11_Data* dx11_data = (ImGui_ImplDX11_Data*)backendUserData;
+
+        ID3D11Device* device = dx11_data->pd3dDevice;
+        ID3D11DeviceContext* context = dx11_data->pd3dDeviceContext;
+
+        ImTextureID tex = LoadTextureFromFileDX11(filename.c_str(), device, context);
+
+        if (tex) {
+            g_TextureCache[filename] = tex;
+        }
+        else {
+            Log("[SanityHUD] Error loading texture: %s\n", filename.c_str());
+        }
+        return tex;
+    }
 
 
 private:
@@ -401,39 +463,6 @@ private:
         frameTextures[10] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_11.png", device, context);
         frameTextures[11] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_12.png", device, context);
     }
-
-
-    ImTextureID LoadTexture(const std::string& filename) {
-        auto it = g_TextureCache.find(filename);
-        if (it != g_TextureCache.end()) {
-            return it->second;
-        }
-
-        void* backendUserData = ImGui::GetIO().BackendRendererUserData;
-        if (!backendUserData) return nullptr;
-
-        struct ImGui_ImplDX11_Data {
-            ID3D11Device* pd3dDevice;
-            ID3D11DeviceContext* pd3dDeviceContext;
-        };
-
-        ImGui_ImplDX11_Data* dx11_data = (ImGui_ImplDX11_Data*)backendUserData;
-
-        ID3D11Device* device = dx11_data->pd3dDevice;
-        ID3D11DeviceContext* context = dx11_data->pd3dDeviceContext;
-
-        ImTextureID tex = LoadTextureFromFileDX11(filename.c_str(), device, context);
-
-        if (tex) {
-            g_TextureCache[filename] = tex;
-        }
-        else {
-            Log("[SanityHUD] Error loading texture: %s\n", filename.c_str());
-        }
-        return tex;
-    }
-
-
 
     ImVec4 GetSanityColor(float ratio) {
         if (ratio > 0.66f) {

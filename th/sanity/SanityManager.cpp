@@ -4,6 +4,7 @@
 
 SanityManager& SanityManager::Instance() {
     static SanityManager instance;
+    instance.PreloadAllFlashTextures();
     return instance;
 }
 
@@ -38,7 +39,30 @@ void ModifyGriffaValue(int newValue) {
     }
 }
 
+
+void SanityManager::PreloadFlashTextures(const std::vector<SanityManager::FlashbackEntry>& entries) {
+    for (const auto& entry : entries) {
+        sanityHud.LoadTexture(entry.image);
+    }
+}
+
+
 void SanityManager::Update(float dt) {
+
+    if (CGameState::m_State == CGameState::E_GAME_LOAD) {
+        flashesEnabled = false;
+        flashesEnableTimerTriggered = false;
+        flashesEnableTimer = 0.0f;
+    }
+    if (!flashesEnableTimerTriggered && CGameState::m_State == CGameState::E_GAME_RUN) {
+        flashesEnableTimerTriggered = true;
+    }
+    if (flashesEnableTimerTriggered && !flashesEnabled) {
+        flashesEnableTimer += dt;
+    }
+    if (flashesEnableTimer >= 10.0f) {
+        flashesEnabled = true;        
+    }
 
     if (diedRun) {
         sanityHud.SetForceHide(true);
@@ -64,7 +88,8 @@ void SanityManager::Update(float dt) {
         return;
     }
 
-    sanityHud.Touch(); // Touch for rendering
+    const auto& cfg = Config::instance();
+
 
     CVehicle* vehicle = player->GetVehiclePtr();
 
@@ -72,6 +97,8 @@ void SanityManager::Update(float dt) {
     float healthPercent = health / 2000.0f;
     float sanityPercent = sanityHud.sanityPercent();
 
+
+    if (health > 0.0f) sanityHud.Touch(); // Touch for rendering
 
     // First frame, just initialize lastPlayerHealth
     if (lastPlayerHealth < 0.0f) {
@@ -109,11 +136,21 @@ void SanityManager::Update(float dt) {
     float regenInterval = regenIntervalSanity * (1.0f - 0.5f * healthPercent);
     float inc = 10.f;
 
+    float decayInterval = 5.0f;
+    float decay = 1.0f;
+
+
     timer += dt;
     if (vehicle) {
         if (timer >= regenInterval) {
             timer = 0.0f;
             if (sanityHud.sanity < sanityHud.MAX_SANITY) IncSanity(inc);
+        }
+    }
+    else {
+        if (timer >= decayInterval) {
+            timer = 0.0f;
+            if (sanityHud.sanity < sanityHud.MAX_SANITY) IncSanity(-decay);
         }
     }
  
@@ -126,7 +163,7 @@ void SanityManager::Update(float dt) {
     }
 
     if (!vehicle) {
-        if (damage > 10.0f) {
+        if (damage > 10.0f && flashesEnabled && healthPercent < cfg.sanity().flash_fire_health_percentage_threshold) {
             float baseProbability = (damage / 100);
             float probability = baseProbability + directorProbabilityBoost;
             if (probability > 1.0f) probability = 1.0f;
@@ -141,8 +178,21 @@ void SanityManager::Update(float dt) {
         }
     }
 
+    
+    if (sanityHud.sanityPercent() < cfg.sanity().sanity_percentage_flashes_fire_automatically && flashesEnabled) {
+        lastFlashBack += dt;
+        if (lastFlashBack >= 15.0f) {
+            lastFlashBack = 0.0f;
+            float chance = 1.0f - sanityHud.sanityPercent();
+            float roll = static_cast<float>(rand()) / RAND_MAX;
+            if (roll < chance)  triggerPacedFlashback();
+            
+        }
+    }
+
+
     director += dt;
-    if (director >= 30.0f) {        
+    if (director >= cfg.sanity().director_timer) {
         director = 0.0f;
         float baseProbability = (sanityHud.MAX_SANITY - sanityHud.sanity) / sanityHud.MAX_SANITY;
         float probability = baseProbability + directorProbabilityBoost;
@@ -153,7 +203,7 @@ void SanityManager::Update(float dt) {
             directorProbabilityBoost = 0.0f;
         }
         else {
-            directorProbabilityBoost += 0.1f;
+            directorProbabilityBoost += cfg.sanity().director_booster;
         }
     }
 }
@@ -193,11 +243,27 @@ void SanityManager::triggerFlashback(float sanity) {
     if (!flash.sounds.empty()) {
         int sIdx = rand() % flash.sounds.size();
         std::string soundFile = flash.sounds[sIdx];
-        SDLPlayer::Instance().playMP3Async("scripts/th/sounds/" + soundFile, 0);
+        SDLPlayer2::Instance().playMP3Async("scripts/th/sounds/" + soundFile, 0);
     }
 }
 
 
+void SanityManager::triggerPacedFlashback() {
+    const std::vector<SanityManager::FlashbackEntry>* pool = &flashes_paced;
+    // elegir un flash aleatorio
+    int idx = rand() % pool->size();
+    const FlashbackEntry& flash = (*pool)[idx];
+
+    // decirle al HUD que muestre esta imagen
+    sanityHud.fireFlashback(flash.image);
+
+    // elegir un sonido de su lista
+    if (!flash.sounds.empty()) {
+        int sIdx = rand() % flash.sounds.size();
+        std::string soundFile = flash.sounds[sIdx];
+        SDLPlayer2::Instance().playMP3Async("scripts/th/sounds/" + soundFile, 0);
+    }
+}
 
 
 void SanityManager::playShuffle(const std::string& path, std::vector<std::string> files, int time) {
@@ -206,7 +272,7 @@ void SanityManager::playShuffle(const std::string& path, std::vector<std::string
     for (const auto& f : files) {
         fullPaths.push_back(path + f);
     }
-    SDLPlayer::Instance().playPlaylistShuffle(fullPaths, true, time);
+    SDLPlayer2::Instance().playPlaylistShuffle(fullPaths, true, time);
 }
 
 
@@ -226,7 +292,7 @@ void SanityManager::playSanity(const std::string& path, float sanity) {
         std::vector<std::function<void()>> shuffleOptions;
 
         if (sanity >= 400.0f && sanity < 600.0f) {
-            shuffleOptions.push_back([this, &path]() { playShuffle(path, shadowhand_sounds, 20000); });
+            //shuffleOptions.push_back([this, &path]() { playShuffle(path, shadowhand_sounds, 20000); });
             shuffleOptions.push_back([this, &path]() { playShuffle(path, baby_cries_sounds, 20000); });
         }
         else if (sanity >= 400.0f && sanity < 600.0f) {
@@ -235,7 +301,7 @@ void SanityManager::playSanity(const std::string& path, float sanity) {
         }
         else if (sanity >= 200.0f && sanity < 400.0f) {
             shuffleOptions.push_back([this, &path]() { playShuffle(path, baby_cries_sounds, 20000); });
-            shuffleOptions.push_back([this, &path]() { playShuffle(path, sanity_pulse_sounds, 20000); });
+            shuffleOptions.push_back([this, &path]() { playShuffle(path, sanity_possession_sounds, 20000); });
         }
         else if (sanity > 0.0f && sanity < 200.0f) {
             shuffleOptions.push_back([this, &path]() { playShuffle(path, sanity_possession_sounds, 20000); });
@@ -288,5 +354,5 @@ void SanityManager::playSanity(const std::string& path, float sanity) {
     std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
     std::string file = candidates[dist(g)];
 
-    SDLPlayer::Instance().playMP3Async(path + file, 0);
+    SDLPlayer2::Instance().playMP3Async(path + file, 0);
 }
