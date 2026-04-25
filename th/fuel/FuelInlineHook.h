@@ -14,6 +14,3 @@ bool InstallFuelMidHook();
 float GetFuel();
 void SetFuel(float fuel);
 uintptr_t GetVehicleBase();
-
-// NUEVO: Obtener el puntero de combustible del vehículo actual (vehicleBase + 0x0C)
-float* GetFuelPtr();
