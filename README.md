@@ -18,11 +18,28 @@ v0.0.3
 - Roguelite feature: Now death has real consequences. Previously, you could die as often as you wanted without any penalty. From now on, when you die, you will lose all your scrap.
 
 v1.0.0
-- Sanity Management. Max must now try not to lose his mind, otherwise he will lose all available Griffa points. Discover by yourself how it works
+- Sanity Management. Max must now try not to lose his mind, otherwise he will lose all available Griffa points.
+Voices, disturbing images… The labyrinth of his mind is as deadly as the dangers of the wastelands. Are you ready to survive the Madness?
 
----
-*Installation*:
+v1.1.0
+- More flashbacks, sounds and main menu banner.
+
+v1.2.0
+- Removing C++ debug dependencies
+- Empty canteen when loading or fast traveling
+
+v1.3.0
+- Adding fuel drain when car receives damage
+- Adding external configuration settings. (scripts/th/config.ini)
+Among them we can highlight:
+   - enabling/disabling features
+   - volume control
+   - sound director timer
+   - flashback management
+
+(only tested in steam version)
+
+Installation:
 1. Install Ultimate ASI Loader into game folder
 2. Drop all files placed in the .zip into "scripts" folder (create if not exists in base game folder)
 3. Enjoy your journey
-

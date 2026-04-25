@@ -46,6 +46,11 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
         printf("[Thirst&Hunger] Sanity Enabled...\n");
     else
         printf("[Thirst&Hunger] Sanity Disabled...\n");
+    
+    if (cfg.sanity().show_hud)
+        printf("  Sanity show HUD Enabled...\n");
+    else
+        printf("  Sanity show HUD Disabled...\n");
 
     printf("  Flash Fire Auto Trigger: %.2f\n", cfg.sanity().sanity_percentage_flashes_fire_automatically);
     printf("  Flash Fire HP Threshold: %.2f\n", cfg.sanity().flash_fire_health_percentage_threshold);

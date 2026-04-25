@@ -12,6 +12,7 @@ struct DecayConfig {
 
 struct SanityConfig {
     bool enabled{};
+    bool show_hud{};
     double sanity_percentage_flashes_fire_automatically{};
     double flash_fire_health_percentage_threshold{};
     double director_timer{};
@@ -44,6 +45,7 @@ inline PluginConfig loadConfig(const std::string& filename) {
     cfg.decay.max_damage = reader.GetReal("decay", "max_damage", 0.0);
 
     cfg.sanity.enabled = reader.GetBoolean("sanity", "enabled", false);
+    cfg.sanity.show_hud = reader.GetBoolean("sanity", "show_hud", false);
     cfg.sanity.sanity_percentage_flashes_fire_automatically = reader.GetReal("sanity", "sanity_percentage_flashes_fire_automatically", 0.0);
     cfg.sanity.flash_fire_health_percentage_threshold = reader.GetReal("sanity", "flash_fire_health_percentage_threshold", 100.0);
     cfg.sanity.director_timer = reader.GetReal("sanity", "director_timer", 0.0);
@@ -56,7 +58,7 @@ inline PluginConfig loadConfig(const std::string& filename) {
     cfg.roguelite.fuel_modifier_on_loading = reader.GetReal("roguelite", "fuel_modifier_on_loading", 1.0);
     cfg.roguelite.loss_fuel_on_car_damage_factor = reader.GetReal("roguelite", "loss_fuel_on_car_damage_factor", 0.0);
 
-    
+
     return cfg;
 }
 

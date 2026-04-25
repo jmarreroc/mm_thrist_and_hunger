@@ -230,44 +230,47 @@ public:
 
         // dibujar en drawlist
         ImDrawList* draw_list = ImGui::GetForegroundDrawList();
-        draw_list->AddImage(
-            tex,
-            topLeft,
-            bottomRight,
-            ImVec2(0, 0), ImVec2(1, 1),
-            IM_COL32(
-                (int)(pulseColor.x * 255),
-                (int)(pulseColor.y * 255),
-                (int)(pulseColor.z * 255),
-                (int)(pulseColor.w * 255)
-            )
-        );
+        if (cfg.sanity().show_hud) {
+            draw_list->AddImage(
+                tex,
+                topLeft,
+                bottomRight,
+                ImVec2(0, 0), ImVec2(1, 1),
+                IM_COL32(
+                    (int)(pulseColor.x * 255),
+                    (int)(pulseColor.y * 255),
+                    (int)(pulseColor.z * 255),
+                    (int)(pulseColor.w * 255)
+                )
+            );
+        
 
-        // ---- barra de progreso arriba de la imagen ----
-        float barHeight = 5.0f;
-        float barMargin = 5.0f; // margen desde el borde superior
-        float barWidth = size.x * sanityRatio;
+            // ---- barra de progreso arriba de la imagen ----
+            float barHeight = 5.0f;
+            float barMargin = 5.0f; // margen desde el borde superior
+            float barWidth = size.x * sanityRatio;
 
-        ImVec2 barPos = ImVec2(basePos.x, basePos.y + barMargin);
-        ImVec4 barColor = GetSanityColor(sanityRatio);
+            ImVec2 barPos = ImVec2(basePos.x, basePos.y + barMargin);
+            ImVec4 barColor = GetSanityColor(sanityRatio);
 
-        draw_list->AddRectFilled(
-            barPos,
-            ImVec2(barPos.x + barWidth, barPos.y + barHeight),
-            IM_COL32(
-                (int)(barColor.x * 255),
-                (int)(barColor.y * 255),
-                (int)(barColor.z * 255),
-                (int)(barColor.w * 255)
-            )
-        );
+            draw_list->AddRectFilled(
+                barPos,
+                ImVec2(barPos.x + barWidth, barPos.y + barHeight),
+                IM_COL32(
+                    (int)(barColor.x * 255),
+                    (int)(barColor.y * 255),
+                    (int)(barColor.z * 255),
+                    (int)(barColor.w * 255)
+                )
+            );
 
-        // opcional: borde de la barra
-        draw_list->AddRect(
-            barPos,
-            ImVec2(basePos.x + size.x, barPos.y + barHeight),
-            IM_COL32(255, 255, 255, 100)
-        );
+            // opcional: borde de la barra
+            draw_list->AddRect(
+                barPos,
+                ImVec2(basePos.x + size.x, barPos.y + barHeight),
+                IM_COL32(255, 255, 255, 100)
+            );
+        }
         
         RenderFlashback(draw_list);
 
