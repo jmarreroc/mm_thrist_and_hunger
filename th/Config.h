@@ -26,6 +26,7 @@ struct RogueliteConfig {
     bool loss_fuel_on_car_damage{};
     double fuel_modifier_on_loading{};
     double loss_fuel_on_car_damage_factor{};
+    double fuel_consumption_multiplier{1.0}; // multiplier for all fuel consumption (2.0 = double)
 };
 
 struct PluginConfig {
@@ -57,6 +58,7 @@ inline PluginConfig loadConfig(const std::string& filename) {
     cfg.roguelite.loss_fuel_on_car_damage = reader.GetBoolean("roguelite", "loss_fuel_on_car_damage", false);
     cfg.roguelite.fuel_modifier_on_loading = reader.GetReal("roguelite", "fuel_modifier_on_loading", 1.0);
     cfg.roguelite.loss_fuel_on_car_damage_factor = reader.GetReal("roguelite", "loss_fuel_on_car_damage_factor", 0.0);
+    cfg.roguelite.fuel_consumption_multiplier = reader.GetReal("roguelite", "fuel_consumption_multiplier", 1.0);
 
 
     return cfg;

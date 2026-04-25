@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <vector>
 #include <cstring>
+#include "th/Config.h"
 
 // Definiciones de los globals
 std::atomic<float*> g_var_fuel{ nullptr };
@@ -31,7 +32,7 @@ bool InstallFuelMidHook() {
     uint8_t* codeBase = dos + nt->OptionalHeader.BaseOfCode;
     size_t codeSize = nt->OptionalHeader.SizeOfCode;
 
-    // Patr髇: F3 0F 11 43 0C 76 (movss [rbx+0x0C],xmm0 ; j? ...)
+    // Patr贸n: F3 0F 11 43 0C 76 (movss [rbx+0x0C],xmm0 ; j? ...)
     const char pat[] = "\xF3\x0F\x11\x43\x0C\x76";
     const char mask[] = "xxxxxx";
 
@@ -40,18 +41,18 @@ bool InstallFuelMidHook() {
         return false;
     }
 
-    // INYECTA EN EL INICIO DE LA INSTRUCCI覰 (NO +1)
+    // INYECTA EN EL INICIO DE LA INSTRUCCI脫N (NO +1)
     uint8_t* inj = hit;        // inicio del movss
-    uint8_t* ret = hit + 5;    // despu閟 de la instrucci髇 original
+    uint8_t* ret = hit + 5;    // despu茅s de la instrucci贸n original
 
-    uint8_t* cave = reinterpret_cast<uint8_t*>(AllocNear(inj, 0x200));
+    uint8_t* cave = reinterpret_cast<uint8_t*>(AllocNear(inj, 0x300));
     if (!cave) {
         return false;
     }
 
     std::vector<uint8_t> stub;
 
-    // Prologue save: preserva rbx tambi閚 (no lo tocamos, pero seguridad)
+    // Prologue save
     emit_u8(stub, 0x50); // push rax
     emit_u8(stub, 0x51); // push rcx
     emit_u8(stub, 0x52); // push rdx
@@ -59,20 +60,25 @@ bool InstallFuelMidHook() {
     emit_bytes(stub, (uint8_t*)"\x41\x50\x41\x51\x41\x52\x41\x53", 8); // push r8,r9,r10,r11
     emit_u8(stub, 0x9C); // pushfq
 
-    // Guardar vehicle base (rbx) en g_var_vehicleBase
-    // mov rax, &g_var_vehicleBase ; mov [rax], rbx
+    // ---- Guardar xmm0 en la pila (para no perderlo) ----
+    // sub rsp, 4 ; movss [rsp], xmm0
+    emit_bytes(stub, (uint8_t*)"\x48\x83\xEC\x04", 4); // sub rsp, 4
+    emit_bytes(stub, (uint8_t*)"\xF3\x0F\x11\x04\x24", 5); // movss [rsp], xmm0
+
+    // ---- Capturar vehicle base (rbx) SOLO si g_var_vehicleBase == 0 ----
     emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_var_vehicleBase);
-    emit_bytes(stub, (uint8_t*)"\x48\x89\x18", 3);
+    emit_bytes(stub, (uint8_t*)"\x48\x83\x38\x00", 4); // cmp qword ptr [rax], 0
+    emit_u8(stub, 0x75); emit_u8(stub, 7); // jne skip_vehicle (skip if already set)
+    emit_bytes(stub, (uint8_t*)"\x48\x89\x18", 3); // mov [rax], rbx
+    // skip_vehicle:
 
-    // Guardar fuel ptr (rbx+0x0C) en g_var_fuel SIN MODIFICAR rbx:
-    // mov rax, &g_var_fuel
-    // lea rdx, [rbx+0x0C]
-    // mov [rax], rdx
-    emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_var_fuel);
-    emit_bytes(stub, (uint8_t*)"\x48\x8D\x53\x0C", 4); // lea rdx, [rbx+0x0C]
-    emit_bytes(stub, (uint8_t*)"\x48\x89\x10", 3);     // mov [rax], rdx
+    // ---- Restaurar xmm0 y ejecutar instrucci贸n original ----
+    // movss xmm0, [rsp]
+    // add rsp, 4
+    emit_bytes(stub, (uint8_t*)"\xF3\x0F\x10\x04\x24", 5); // movss xmm0, [rsp]
+    emit_bytes(stub, (uint8_t*)"\x48\x83\xC4\x04", 4); // add rsp, 4
 
-    // Re-emitir instrucci髇 original EXACTA: movss [rbx+0x0C], xmm0
+    // Re-emitir instrucci贸n original EXACTA: movss [rbx+0x0C], xmm0
     emit_bytes(stub, (uint8_t*)"\xF3\x0F\x11\x43\x0C", 5);
 
     // Epilogue restore
@@ -130,4 +136,11 @@ void SetFuel(float fuel) {
 
 uintptr_t GetVehicleBase() {
     return g_var_vehicleBase.load(std::memory_order_relaxed);
+}
+
+// Obtener el puntero de combustible del veh铆culo actual
+float* GetFuelPtr() {
+    auto vehicleBase = g_var_vehicleBase.load(std::memory_order_relaxed);
+    if (!vehicleBase) return nullptr;
+    return reinterpret_cast<float*>(vehicleBase + 0x0C);
 }

@@ -28,7 +28,7 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 
     printf("=========================================\n");
-    printf("[Thirst&Hunger] 1.3.1 Configuration Status\n");
+    printf("[Thirst&Hunger] 1.3.5 Configuration Status\n");
     printf("=========================================\n");
 
     if (cfg.decay().enabled)
@@ -64,6 +64,7 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
     printf("  loss_fuel_on_car_damage:  %s\n", cfg.roguelite().loss_fuel_on_car_damage ? "Enabled" : "Disabled");
     printf("  fuel_modifier_on_loading:  %.2f\n", cfg.roguelite().fuel_modifier_on_loading);
     printf("  loss_fuel_on_car_damage_factor:  %.2f\n", cfg.roguelite().loss_fuel_on_car_damage_factor);
+    printf("  fuel_consumption_multiplier:  %.2f\n", cfg.roguelite().fuel_consumption_multiplier);
 
     printf("=========================================\n");
 
@@ -72,6 +73,10 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 DEFHOOK(void, Thirst__Hunger, (void* thiz, float dt)) {
     const auto& cfg = Config::instance();
 
+    // Ejecutar el juego PRIMERO (para que consuma gasolina)
+    Thirst__Hunger_orig(thiz, dt);
+
+    // Ahora sí, leer el fuel después del consumo del juego
     if (cfg.decay().enabled)
         DecayManager::Instance().Update(dt);
 
@@ -86,8 +91,6 @@ DEFHOOK(void, Thirst__Hunger, (void* thiz, float dt)) {
 
     FuelManager::Instance().Update(dt);
     VehicleDamageProxy::Instance().Update(dt);
-
-    return Thirst__Hunger_orig(thiz, dt);
 }
 
 
