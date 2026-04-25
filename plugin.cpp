@@ -28,7 +28,7 @@ void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 
     printf("=========================================\n");
-    printf("[Thirst&Hunger] Configuration Status\n");
+    printf("[Thirst&Hunger] 1.3.0 Configuration Status\n");
     printf("=========================================\n");
 
     if (cfg.decay().enabled)

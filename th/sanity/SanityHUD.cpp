@@ -84,10 +84,9 @@ public:
     ImTextureID madTextures[5] = { nullptr };
     ImTextureID frameTextures[12] = { nullptr };    
 
-    bool texturesLoaded = false;
     bool force_hide = true;
     int lastTouchedFrame = -1;
-    
+
     ImTextureID flashbackTexture = nullptr;
     bool flashbackActive = false;
     float flashStart = 0.0f;
@@ -97,6 +96,53 @@ public:
     }
 
     SanityHUD() : ImGuiRenderer() { }
+
+    void RenderInit(bool reInit) override {
+        // Load all textures ONCE during renderer initialization
+        void* backendUserData = ImGui::GetIO().BackendRendererUserData;
+        if (!backendUserData) return;
+
+        struct ImGui_ImplDX11_Data { ID3D11Device* pd3dDevice; ID3D11DeviceContext* pd3dDeviceContext; };
+        ImGui_ImplDX11_Data* dx11_data = (ImGui_ImplDX11_Data*)backendUserData;
+        ID3D11Device* device = dx11_data->pd3dDevice;
+        ID3D11DeviceContext* context = dx11_data->pd3dDeviceContext;
+
+        // Banner texture
+        modBannerTexture = LoadTextureFromFileDX11("scripts/th/textures/banner.png", device, context);
+
+        // Madness textures
+        madTextures[0] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD1.png", device, context);
+        madTextures[1] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD2.png", device, context);
+        madTextures[2] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD3.png", device, context);
+        madTextures[3] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD4.png", device, context);
+        madTextures[4] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD5.png", device, context);
+        calmTexture = LoadTextureFromFileDX11("scripts/th/textures/mad/CALM.png", device, context);
+
+        // Frame textures
+        frameTextures[0] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_1.png", device, context);
+        frameTextures[1] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_2.png", device, context);
+        frameTextures[2] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_3.png", device, context);
+        frameTextures[3] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_4.png", device, context);
+        frameTextures[4] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_5.png", device, context);
+        frameTextures[5] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_6.png", device, context);
+        frameTextures[6] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_7.png", device, context);
+        frameTextures[7] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_8.png", device, context);
+        frameTextures[8] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_9.png", device, context);
+        frameTextures[9] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_10.png", device, context);
+        frameTextures[10] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_11.png", device, context);
+        frameTextures[11] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_12.png", device, context);
+
+        Log("[SanityHUD] Textures loaded in RenderInit\n");
+    }
+
+    void RenderShutdown() override {
+        // Textures are released when DX11 device is destroyed on game exit
+        modBannerTexture = nullptr;
+        calmTexture = nullptr;
+        flashbackTexture = nullptr;
+        for (auto& t : madTextures) t = nullptr;
+        for (auto& t : frameTextures) t = nullptr;
+    }
 
 
     void Touch() {
@@ -109,14 +155,13 @@ public:
     }
 
     void Game() override {
-        if (CGameState::m_InMainMenu) SendRenderEvent([this]() { 
-            modBannerTexture = LoadTexture("scripts/th/textures/banner.png");
-            mod_title = true; 
-        });        
-        else SendRenderEvent([this]() { 
-            mod_title = false;
-            modBannerTexture = nullptr;
-         });
+        // Texture already loaded in RenderInit() - just toggle the flag
+        if (CGameState::m_InMainMenu) {
+            SendRenderEvent([this]() { mod_title = true; });
+        }
+        else {
+            SendRenderEvent([this]() { mod_title = false; });
+        }
     }
 
     void GameHandleEvent(Event const& _event) override {
@@ -169,10 +214,7 @@ public:
 
         CVehicle* vehicle = player->GetVehiclePtr();
 
-        if (!texturesLoaded) {
-            LoadTextures();
-            texturesLoaded = true;
-        }
+        // Textures are loaded in RenderInit() - no need to check here
 
         // ---- madness overlay ----
         float sanityRatio = sanity / MAX_SANITY;
@@ -433,39 +475,6 @@ public:
 
 
 private:
-
-    void LoadTextures() {
-        void* backendUserData = ImGui::GetIO().BackendRendererUserData;
-        if (!backendUserData) 
-            return;  
-
-        // Cast seguro dentro del cpp (sólo para uso interno, evita el header)
-        struct ImGui_ImplDX11_Data { ID3D11Device* pd3dDevice; ID3D11DeviceContext* pd3dDeviceContext; };
-        ImGui_ImplDX11_Data* dx11_data = (ImGui_ImplDX11_Data*)backendUserData;
-
-        ID3D11Device* device = dx11_data->pd3dDevice;
-        ID3D11DeviceContext* context = dx11_data->pd3dDeviceContext;
-
-        madTextures[0] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD1.png", device, context);
-        madTextures[1] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD2.png", device, context);
-        madTextures[2] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD3.png", device, context);
-        madTextures[3] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD4.png", device, context);
-        madTextures[4] = LoadTextureFromFileDX11("scripts/th/textures/mad/MAD5.png", device, context);
-        calmTexture = LoadTextureFromFileDX11("scripts/th/textures/mad/CALM.png", device, context);
-
-        frameTextures[0] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_1.png", device, context);
-        frameTextures[1] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_2.png", device, context);
-        frameTextures[2] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_3.png", device, context);
-        frameTextures[3] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_4.png", device, context);
-        frameTextures[4] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_5.png", device, context);
-        frameTextures[5] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_6.png", device, context);
-        frameTextures[6] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_7.png", device, context);
-        frameTextures[7] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_8.png", device, context);
-        frameTextures[8] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_9.png", device, context);
-        frameTextures[9] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_10.png", device, context);
-        frameTextures[10] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_11.png", device, context);
-        frameTextures[11] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_12.png", device, context);
-    }
 
     ImVec4 GetSanityColor(float ratio) {
         if (ratio > 0.66f) {
