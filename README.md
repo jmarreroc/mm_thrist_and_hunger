@@ -37,6 +37,9 @@ Among them we can highlight:
    - sound director timer
    - flashback management
 
+v1.3.1
+- ImgUI Flickering fix
+
 (only tested in steam version)
 
 Installation:
