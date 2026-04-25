@@ -19,6 +19,7 @@ void FuelManager::Update(float dt) {
     if (CGameState::m_InMainMenu || CGameState::m_State != CGameState::E_GAME_RUN) {
         initialized = false;
         initializedFuel = false;
+        return;
     }
 
     if (CGameState::m_State == CGameState::E_GAME_RUN && !initialized) {
@@ -31,17 +32,18 @@ void FuelManager::Update(float dt) {
 
     auto fuelPtr = g_var_fuel.load(std::memory_order_relaxed);
 
-    if (fuelPtr) {
-        if (!initializedFuel) {
-            float cur = *fuelPtr;
-            float reduced = cur * cfg.roguelite().fuel_modifier_on_loading;
-            *fuelPtr = reduced;
-            lastObservedFuel = reduced;
-            initializedFuel = true;
-        }
-    }
-
     if (!player || !vehicle) return;
+
+
+    if (fuelPtr && !initializedFuel) {
+        float cur = *fuelPtr;
+        float factor = cfg.roguelite().fuel_modifier_on_loading;
+        float reduced = cur * (1.0f - factor);
+        float amountReduced = cur - reduced;
+        *fuelPtr = reduced;
+        lastObservedFuel = reduced;
+        initializedFuel = true;
+    }
 
     float currentVehicleHealth = vehicle->GetHealth();
     // First frame, just initialize lastVehicleHealth
