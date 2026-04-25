@@ -132,7 +132,7 @@ public:
         frameTextures[10] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_11.png", device, context);
         frameTextures[11] = LoadTextureFromFileDX11("scripts/th/textures/mad/frames/madness_frame_12.png", device, context);
 
-        Log("[SanityHUD] Textures loaded in RenderInit\n");
+        //Log("[SanityHUD] Textures loaded in RenderInit\n");
     }
 
     void RenderShutdown() override {
