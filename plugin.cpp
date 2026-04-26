@@ -15,6 +15,7 @@ DLLATTATCH;
 void PluginAttach(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
     Config::instance().load("th/config.ini");
+    SyncFuelMultiplier();
     const auto& cfg = Config::instance();
     
     AllocConsole();

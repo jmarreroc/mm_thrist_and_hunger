@@ -1,12 +1,9 @@
 #include "FuelInlineHook.h"
 #include "th/tools/MidHookHelper.h"
+#include "th/Config.h"
 #include <cstdio>
 #include <vector>
 #include <cstring>
-
-// Definiciones de los globals
-std::atomic<float*> g_var_fuel{ nullptr };
-std::atomic<uintptr_t> g_var_vehicleBase{ 0 };
 
 // Emit helpers
 inline void emit_u8(std::vector<uint8_t>& buf, uint8_t v) { buf.push_back(v); }
@@ -18,6 +15,37 @@ inline void emit(std::vector<uint8_t>& buf, T v) {
 }
 inline void emit_bytes(std::vector<uint8_t>& buf, const uint8_t* data, size_t len) {
     buf.insert(buf.end(), data, data + len);
+}
+
+// Definiciones de los globals
+std::atomic<float*> g_var_fuel{ nullptr };
+std::atomic<uintptr_t> g_var_vehicleBase{ 0 };
+std::atomic<float> g_fuelConsumptionMultiplier{ 1.0f };
+
+// Globals para pasar datos al helper sin usar convención de llamada compleja
+static float g_savedXmm0 = 0.0f;   // valor de xmm0 que el juego quiere escribir
+static float g_adjustedXmm0 = 0.0f; // valor ajustado por el helper
+
+// Helper llamado desde el stub — ajusta el consumo de combustible
+extern "C" __declspec(noinline) void AdjustFuelHookHelper() {
+    uintptr_t rbx = g_var_vehicleBase.load(std::memory_order_relaxed);
+    if (!rbx) return;
+
+    float* fuelPtr = (float*)(rbx + 0x0C);
+    float oldFuel = *fuelPtr;
+    float newFuel = g_savedXmm0;
+
+    if (newFuel < oldFuel) {
+        // Es consumo: multiplicar la cantidad consumida
+        float decrease = oldFuel - newFuel;
+        float multiplier = g_fuelConsumptionMultiplier.load(std::memory_order_relaxed);
+        float adjusted = oldFuel - (decrease * multiplier);
+        if (adjusted < 0.0f) adjusted = 0.0f;
+        g_adjustedXmm0 = adjusted;
+    } else {
+        // No es consumo (repostaje o igual), no tocar
+        g_adjustedXmm0 = newFuel;
+    }
 }
 
 bool InstallFuelMidHook() {
@@ -44,14 +72,14 @@ bool InstallFuelMidHook() {
     uint8_t* inj = hit;        // inicio del movss
     uint8_t* ret = hit + 5;    // después de la instrucción original
 
-    uint8_t* cave = reinterpret_cast<uint8_t*>(AllocNear(inj, 0x200));
+    uint8_t* cave = reinterpret_cast<uint8_t*>(AllocNear(inj, 0x300));
     if (!cave) {
         return false;
     }
 
     std::vector<uint8_t> stub;
 
-    // Prologue save: preserva rbx también (no lo tocamos, pero seguridad)
+    // Prologue save: preserva registros
     emit_u8(stub, 0x50); // push rax
     emit_u8(stub, 0x51); // push rcx
     emit_u8(stub, 0x52); // push rdx
@@ -60,17 +88,26 @@ bool InstallFuelMidHook() {
     emit_u8(stub, 0x9C); // pushfq
 
     // Guardar vehicle base (rbx) en g_var_vehicleBase
-    // mov rax, &g_var_vehicleBase ; mov [rax], rbx
     emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_var_vehicleBase);
     emit_bytes(stub, (uint8_t*)"\x48\x89\x18", 3);
 
-    // Guardar fuel ptr (rbx+0x0C) en g_var_fuel SIN MODIFICAR rbx:
-    // mov rax, &g_var_fuel
-    // lea rdx, [rbx+0x0C]
-    // mov [rax], rdx
+    // Guardar fuel ptr (rbx+0x0C) en g_var_fuel
     emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_var_fuel);
     emit_bytes(stub, (uint8_t*)"\x48\x8D\x53\x0C", 4); // lea rdx, [rbx+0x0C]
     emit_bytes(stub, (uint8_t*)"\x48\x89\x10", 3);     // mov [rax], rdx
+
+    // --- Ajustar consumo de combustible ---
+    // 1. Guardar xmm0 en g_savedXmm0 (movss [addr], xmm0)
+    emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_savedXmm0);
+    emit_bytes(stub, (uint8_t*)"\xF3\x0F\x11\x00", 4);    // movss [rax], xmm0
+
+    // 2. Llamar al helper (no args, usa globals)
+    emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&AdjustFuelHookHelper);
+    emit_bytes(stub, (uint8_t*)"\xFF\xD0", 2);        // call rax
+
+    // 3. Cargar valor ajustado en xmm0 desde g_adjustedXmm0 (movss xmm0, [addr])
+    emit_bytes(stub, (uint8_t*)"\x48\xB8", 2); emit<uint64_t>(stub, (uint64_t)&g_adjustedXmm0);
+    emit_bytes(stub, (uint8_t*)"\xF3\x0F\x10\x00", 4);    // movss xmm0, [rax]
 
     // Re-emitir instrucción original EXACTA: movss [rbx+0x0C], xmm0
     emit_bytes(stub, (uint8_t*)"\xF3\x0F\x11\x43\x0C", 5);
@@ -115,6 +152,12 @@ bool InstallFuelMidHook() {
     FlushInstructionCache(GetCurrentProcess(), inj, sizeof(jmp5));
     printf("[FuelHook] Installed successfully at %p -> cave %p\n", inj, cave);
     return true;
+}
+
+void SyncFuelMultiplier() {
+    float m = (float)Config::instance().roguelite().fuel_consumption_multiplier;
+    g_fuelConsumptionMultiplier.store(m, std::memory_order_relaxed);
+    printf("[FuelHook] fuel_consumption_multiplier = %.2f\n", m);
 }
 
 // Accesores
